@@ -2,9 +2,25 @@
   "name": "admin-realtime-streamer-api",
   "version": "1.0.0",
   "description": "Admin API for the Realtime data streamer",
-  "main": "index.js",
+  "main": "api.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node api.js",
+    "start:dev": "nodemon api.js",
+    "start:dev:debug": "echo 'TODO: setup VSCode launchers",
+    "deploy:staging": "echo 'TODO: deploy:staging'",
+    "deploy:production": "echo 'TODO: deploy:production'",
+    "test:unit": "jest --coverage --verbose=false tests/unit",
+    "test:integration": "jest --coverage --verbose=false tests/integration",
+    "test:all": "jest --coverage --verbose=false",
+    "test:all:verbose": "jest --coverage --verbose=true",
+    "test": "jest --coverage",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:reset": "sequelize-cli db:reset",
+    "db:seed": "sequelize-cli db:seed",
+    "db:seed:undo": "sequelize-cli db:seed:undo",
+    "version:current": "echo $npm_package_version",
+    "release": "git add . && yarn version && VERSION=$(yarn -s version:current) && git push origin release/v$VERSION && git push origin v$VERSION && git checkout main && git pull --rebase origin main && git rebase release/v$VERSION && git push origin main && git checkout dev && git pull --rebase && git rebase release/v$VERSION && git push origin dev"
   },
   "repository": {
     "type": "git",
@@ -15,5 +31,35 @@
   "bugs": {
     "url": "https://github.com/bokjo/che-realtime-data-streamer/issues"
   },
-  "homepage": "https://github.com/bokjo/che-realtime-data-streamer#readme"
+  "homepage": "https://github.com/bokjo/che-realtime-data-streamer#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.9",
+    "@types/hapi__joi": "^17.1.6",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.9",
+    "@types/passport": "^1.0.4",
+    "@types/sequelize": "^4.28.9",
+    "@types/supertest": "^2.0.10",
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "jest": "^26.6.3",
+    "nock": "^13.0.5",
+    "nodemon": "^2.0.6",
+    "supertest": "^6.0.1"
+  },
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "axios": "^0.21.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^4.2.0",
+    "mysql2": "^2.2.5",
+    "passport": "^0.4.1",
+    "pino": "^6.7.0",
+    "pino-std-serializers": "^3.0.0",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0"
+  }
 }

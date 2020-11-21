@@ -1,0 +1,48 @@
+SHOW TOPICS;
+
+PRINT ratings;
+
+-- Create sink connector from the 'ratings' topic
+CREATE SINK CONNECTOR SINK_ES_RATINGS WITH (
+    'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
+    'topics'          = 'ratings',
+    'connection.url'  = 'http://elasticsearch:9200',
+    'type.name'       = '_doc',
+    'key.ignore'      = 'false',
+    'schema.ignore'   = 'true',
+    'transforms'      = 'ExtractTimestamp',
+    'transforms.ExtractTimestamp.type' = 'org.apache.kafka.connect.transforms.InsertField$Value',
+    'transforms.ExtractTimestamp.timestamp.field' = 'RATING_TS'
+);
+
+-- Create stream from the 'ratings' topic
+CREATE STREAM RATINGS WITH (KAFKA_TOPIC='ratings',VALUE_FORMAT='AVRO');
+
+-- Select particular colums from the live stream data
+SELECT USER_ID, STARS, CHANNEL, MESSAGE 
+  FROM RATINGS EMIT CHANGES;
+
+-- Filter particular colums from the live stream data
+SELECT USER_ID, STARS, CHANNEL, MESSAGE 
+  FROM RATINGS 
+ WHERE LCASE(CHANNEL) NOT LIKE '%test%' 
+  EMIT CHANGES;
+
+-- Create derived stream from the RATINGS one with filtered test data...
+CREATE STREAM RATINGS_LIVE AS
+    SELECT USER_ID, STARS, CHANNEL, MESSAGE 
+    FROM RATINGS 
+    WHERE LCASE(CHANNEL) NOT LIKE '%test%' 
+    EMIT CHANGES;
+
+-- Create derived stream from the RATINGS one with test data only...
+CREATE STREAM RATINGS_TEST AS
+    SELECT USER_ID, STARS, CHANNEL, MESSAGE 
+    FROM RATINGS 
+    WHERE LCASE(CHANNEL) LIKE '%test%' 
+    EMIT CHANGES;
+
+SELECT * FROM RATINGS_LIVE EMIT CHANGES LIMIT 5;
+SELECT * FROM RATINGS_TEST EMIT CHANGES LIMIT 5;   
+
+DESCRIBE EXTENDED RATINGS_LIVE;
