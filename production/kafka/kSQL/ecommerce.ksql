@@ -1,15 +1,15 @@
--- Create source connector for the products table in MySQL ecommerce DB
+-- Create source connector for the ecommerce db in MySQL
 
--- DROP CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_01;
-CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_01 WITH (
+-- DROP CONNECTOR SOURCE_MYSQL_ECOMMERCE_01;
+CREATE SOURCE CONNECTOR SOURCE_MYSQL_ECOMMERCE_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
     'database.hostname' = 'mysql',
     'database.port' = '3306',
     'database.user' = 'debezium',
     'database.password' = 'dbz',
-    'database.server.id' = '42',
+    'database.server.id' = '1',
     'database.server.name' = 'che-ecommerce',
-    'table.whitelist' = 'ecommerce.products',
+    'table.whitelist' = 'ecommerce.products,ecommerce.attributes,ecommerce.attributes_kv',
     'database.history.kafka.bootstrap.servers' = 'kafka:29092',
     'database.history.kafka.topic' = 'dbhistory.ecommerce' ,
     'include.schema.changes' = 'false',
@@ -28,56 +28,11 @@ SHOW TOPICS;
 
 PRINT 'che-ecommerce.ecommerce.products' FROM BEGINNING;
 
--- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_01;
-CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_01 WITH (
-    'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = 'mysql',
-    'database.port' = '3306',
-    'database.user' = 'debezium',
-    'database.password' = 'dbz',
-    'database.server.id' = '43',
-    'database.server.name' = 'che-ecommerce',
-    'table.whitelist' = 'ecommerce.attributes',
-    'database.history.kafka.bootstrap.servers' = 'kafka:29092',
-    'database.history.kafka.topic' = 'dbhistory.ecommerce-attributes' ,
-    'include.schema.changes' = 'false',
-    'transforms'= 'unwrap,extractkey',
-    'transforms.unwrap.type'= 'io.debezium.transforms.ExtractNewRecordState',
-    'transforms.extractkey.type'= 'org.apache.kafka.connect.transforms.ExtractField$Key',
-    'transforms.extractkey.field'= 'id',
-    'key.converter'= 'org.apache.kafka.connect.storage.StringConverter',
-    'value.converter'= 'io.confluent.connect.avro.AvroConverter',
-    'value.converter.schema.registry.url'= 'http://schema-registry:8081'
-    );
-
 PRINT 'che-ecommerce.ecommerce.attributes' FROM BEGINNING;
-
--- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_01;
-CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_01 WITH (
-    'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = 'mysql',
-    'database.port' = '3306',
-    'database.user' = 'debezium',
-    'database.password' = 'dbz',
-    'database.server.id' = '44',
-    'database.server.name' = 'che-ecommerce',
-    'table.whitelist' = 'ecommerce.attributes_kv',
-    'database.history.kafka.bootstrap.servers' = 'kafka:29092',
-    'database.history.kafka.topic' = 'dbhistory.ecommerce-attributes-kv' ,
-    'include.schema.changes' = 'false',
-    'transforms'= 'unwrap,extractkey',
-    'transforms.unwrap.type'= 'io.debezium.transforms.ExtractNewRecordState',
-    'transforms.extractkey.type'= 'org.apache.kafka.connect.transforms.ExtractField$Key',
-    'transforms.extractkey.field'= 'update_ts',
-    'key.converter'= 'org.apache.kafka.connect.storage.StringConverter',
-    'value.converter'= 'io.confluent.connect.avro.AvroConverter',
-    'value.converter.schema.registry.url'= 'http://schema-registry:8081'
-    );
 
 PRINT 'che-ecommerce.ecommerce.attributes_kv' FROM BEGINNING;
 
-
-
+-- Create tables in KSQL representing the MySQL tables 
 CREATE TABLE PRODUCTS (PRODUCT_ID VARCHAR PRIMARY KEY)
   WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.products', VALUE_FORMAT='AVRO');
 
@@ -127,15 +82,13 @@ SELECT TIMESTAMPTOSTRING(ROWTIME, 'HH:mm:ss') AS EVENT_TS,
   FROM ATTRIBUTES_KV_STREAM WHERE ID=2
   EMIT CHANGES;
 
-
--- Join the products with atributes streams
+-- Join the products with atributes streams [EXAMPLES TODO:]
 
 SELECT * 
   FROM ATTRIBUTES A
  RIGHT JOIN ATTRIBUTES_KV AK
     ON A.ID = AK.ATTRIBUTE
   EMIT CHANGES; 
-
 
   SELECT * 
     FROM PRODUCTS P
@@ -161,6 +114,7 @@ SELECT *
 
 SET 'auto.offset.reset' = 'earliest';
 
+-- Join both tables together
 CREATE STREAM PRODUCTS_WITH_ATTR_DATA
   WITH (KAFKA_TOPIC='products-with-attr-data') AS
 SELECT P.PRODUCT_ID, P.NAME, P.DESCRIPTION AS PRODUCT_DESCRIPTION,
@@ -172,7 +126,6 @@ INNER JOIN ATTRIBUTES A
  EMIT CHANGES;
 
  -- Create sink connector with ES and send the data over in real time...
-
 
  CREATE SINK CONNECTOR SINK_ELASTIC_PRODUCTS_WITH_ATTR_01 WITH (
   'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',

@@ -1,0 +1,23 @@
+# without tmp folder setup
+
+java.lang.NoClassDefFoundError: Could not initialize class org.rocksdb.DBOptions
+Caused by: Could not initialize class org.rocksdb.DBOptions
+
+
+# with tmp folder setup
+
+java.lang.UnsatisfiedLinkError: /Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnilib: dlopen(/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnilib, 1): no suitable image found.  Did find:
+	/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnilib: code signature in (/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnilib) not valid for use in process using Library Validation: mapped file has no cdhash, completely unsigned? Code has to be at least ad-hoc signed.
+Caused by:
+	/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnilib:
+	dlopen(/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnil
+	ib, 1): no suitable image found.  Did
+	find:
+	/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnil
+	ib: code signature in
+	(/Users/bojanche/confluent-6.0.0/tmp/librocksdbjni5437221267997775798.jnilib)
+	not valid for use in process using Library Validation: mapped file has no
+	cdhash, completely unsigned? Code has to be at least ad-hoc signed.
+
+
+

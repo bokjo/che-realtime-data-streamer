@@ -1,12 +1,12 @@
-import * as k8s from "@pulumi/kubernetes";
-import * as pulumi from "@pulumi/pulumi";
-import * as gcp from "@pulumi/gcp";
-import * as random from "@pulumi/random";
+import * as k8s from "@pulumi/kubernetes"
+import * as pulumi from "@pulumi/pulumi"
+import * as gcp from "@pulumi/gcp"
+import * as random from "@pulumi/random"
 
-const name = "che-realtime-data-streamer";
+const name = "che-realtime-data-streamer"
 
 // Create a GKE cluster
-const engineVersion = gcp.container.getEngineVersions().then(v => v.latestMasterVersion);
+const engineVersion = gcp.container.getEngineVersions().then(v => v.latestMasterVersion)
 const cluster = new gcp.container.Cluster(name, {
     initialNodeCount: 2,
     minMasterVersion: engineVersion,
@@ -20,10 +20,10 @@ const cluster = new gcp.container.Cluster(name, {
             "https://www.googleapis.com/auth/monitoring"
         ],
     },
-});
+})
 
 // Export the Cluster name
-export const clusterName = cluster.name;
+export const clusterName = cluster.name
 
 // Manufacture a GKE-style kubeconfig. Note that this is slightly "different"
 // because of the way GKE requires gcloud to be in the picture for cluster
@@ -31,7 +31,7 @@ export const clusterName = cluster.name;
 export const kubeconfig = pulumi.
     all([cluster.name, cluster.endpoint, cluster.masterAuth]).
     apply(([name, endpoint, masterAuth]) => {
-        const context = `${gcp.config.project}_${gcp.config.zone}_${name}`;
+        const context = `${gcp.config.project}_${gcp.config.zone}_${name}`
         return `apiVersion: v1
 clusters:
 - cluster:
@@ -56,13 +56,13 @@ users:
         expiry-key: '{.credential.token_expiry}'
         token-key: '{.credential.access_token}'
       name: gcp
-`;
-    });
+`
+    })
 
 // Create a Kubernetes provider instance that uses our cluster from above.
 const clusterProvider = new k8s.Provider(name, {
     kubeconfig: kubeconfig,
-});
+})
 
 // MySQL Database Instance
 const dbInstance = new gcp.sql.DatabaseInstance("che_db_instance", {
@@ -73,12 +73,19 @@ const dbInstance = new gcp.sql.DatabaseInstance("che_db_instance", {
     deletionProtection: true,
     databaseVersion: "MYSQL_8_0",
     name: "che_db_instance"
-});
+})
 
-const database = new gcp.sql.Database("database", { instance: dbInstance.name });
+export const dbConnectionName = dbInstance.connectionName
+
+const database = new gcp.sql.Database("ecommerce", { instance: dbInstance.name })
+
+export const dbName = database.name
 
 const users = new gcp.sql.User("users", {
     instance: dbInstance.name,
-    host: "che.mk",
+    name: "che",
+    host: "che.mk", // TODO: change it to your IP or open it fully public [TESTING ONLY]
     password: process.env.DB_PASSWD
-});
+})
+
+users.name

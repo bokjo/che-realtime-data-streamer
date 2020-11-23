@@ -1,0 +1,21 @@
+{
+    "connector.class": "MySqlCdcSource",
+    "name": "TestDebeziumStreamerConnector",
+    "kafka.api.key": "****************",
+    "kafka.api.secret": "****************************************************************",
+    "database.hostname": "[YOUR SQL DB INSTANCE IP HERE]",
+    "database.port": "3306",
+    "database.user": "[YOUR SQL USER NAME HERE]",
+    "database.password": "[YOUR SQL DB USER HERE]",
+    "database.server.name": "che-ecommerce",
+    "database.whitelist": [
+        "ecommerce"
+    ],
+    "table.whitelist": [
+        "ecommerce.products,ecommerce.attributes,ecommerce.attributes_kv"
+    ],
+    "snapshot.mode": "initial",
+    "tombstones.on.delete": "true",
+    "output.data.format": "AVRO",
+    "tasks.max": "1"
+}

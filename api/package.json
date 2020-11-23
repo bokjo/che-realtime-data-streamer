@@ -1,7 +1,7 @@
 {
   "name": "admin-realtime-streamer-api",
   "version": "1.0.0",
-  "description": "Admin API for the Realtime data streamer",
+  "description": "API service for testing the Realtime data streamer",
   "main": "api.js",
   "scripts": {
     "start": "node api.js",

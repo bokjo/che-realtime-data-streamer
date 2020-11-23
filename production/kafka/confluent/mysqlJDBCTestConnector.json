@@ -1,0 +1,25 @@
+{
+    "connector.class": "MySqlSource",
+    "name": "TestMySQLStreamerConnector",
+    "kafka.api.key": "****************",
+    "kafka.api.secret": "****************************************************************",
+    "topic.prefix": "test-streamer-",
+    "connection.host": "[YOUR SQL DB INSTANCE IP HERE]",
+    "connection.port": "3306",
+    "connection.user": "[YOUR SQL USER NAME HERE]",
+    "connection.password": "[YOUR SQL USER PASSWORD HERE]",
+    "db.name": "ecommerce",
+    "table.whitelist": [
+        "products,attributes,attributes_kv"
+    ],
+    "timestamp.column.name": [
+        "update_ts"
+    ],
+    "table.types": [
+        "TABLE"
+    ],
+    "db.timezone": "Europe/Berlin",
+    "numeric.mapping": "best_fit",
+    "output.data.format": "AVRO",
+    "tasks.max": "1"
+}

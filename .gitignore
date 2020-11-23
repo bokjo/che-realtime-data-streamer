@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+confluent-operator-1.6.0-for-confluent-platform-6.0.0
+strimzi-0.20.0
