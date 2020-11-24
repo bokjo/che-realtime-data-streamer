@@ -1,17 +1,17 @@
 -- Create source connector for the products table in MySQL ecommerce DB
 
--- DROP CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_01;
-CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_01 WITH (
+-- DROP CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_PROD_01;
+CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_PROD_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = 'mysql',
+    'database.hostname' = '34.107.37.79',
     'database.port' = '3306',
     'database.user' = 'debezium',
     'database.password' = 'dbz',
-    'database.server.id' = '42',
-    'database.server.name' = 'che-ecommerce',
+    'database.server.id' = '52',
+    'database.server.name' = 'che-ecommerce-prod',
     'table.whitelist' = 'ecommerce.products',
     'database.history.kafka.bootstrap.servers' = 'kafka:29092',
-    'database.history.kafka.topic' = 'dbhistory.ecommerce' ,
+    'database.history.kafka.topic' = 'dbhistory.ecommerce-prod' ,
     'include.schema.changes' = 'false',
     'transforms'= 'unwrap,extractkey',
     'transforms.unwrap.type'= 'io.debezium.transforms.ExtractNewRecordState',
@@ -26,20 +26,20 @@ SHOW CONNECTORS;
 
 SHOW TOPICS;
 
-PRINT 'che-ecommerce.ecommerce.products' FROM BEGINNING;
+PRINT 'che-ecommerce-prod.ecommerce.products' FROM BEGINNING;
 
--- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_01;
-CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_01 WITH (
+-- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_PROD_01;
+CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_PROD_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = 'mysql',
+    'database.hostname' = '34.107.37.79',
     'database.port' = '3306',
     'database.user' = 'debezium',
     'database.password' = 'dbz',
-    'database.server.id' = '43',
-    'database.server.name' = 'che-ecommerce',
+    'database.server.id' = '53',
+    'database.server.name' = 'che-ecommerce-prod',
     'table.whitelist' = 'ecommerce.attributes',
     'database.history.kafka.bootstrap.servers' = 'kafka:29092',
-    'database.history.kafka.topic' = 'dbhistory.ecommerce-attributes' ,
+    'database.history.kafka.topic' = 'dbhistory.ecommerce-attributes-prod' ,
     'include.schema.changes' = 'false',
     'transforms'= 'unwrap,extractkey',
     'transforms.unwrap.type'= 'io.debezium.transforms.ExtractNewRecordState',
@@ -50,20 +50,20 @@ CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_01 WITH (
     'value.converter.schema.registry.url'= 'http://schema-registry:8081'
     );
 
-PRINT 'che-ecommerce.ecommerce.attributes' FROM BEGINNING;
+PRINT 'che-ecommerce-prod.ecommerce.attributes' FROM BEGINNING;
 
--- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_01;
-CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_01 WITH (
+-- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_PROD_01;
+CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_PROD_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = 'mysql',
+    'database.hostname' = '34.107.37.79',
     'database.port' = '3306',
     'database.user' = 'debezium',
     'database.password' = 'dbz',
-    'database.server.id' = '44',
-    'database.server.name' = 'che-ecommerce',
+    'database.server.id' = '54',
+    'database.server.name' = 'che-ecommerce-prod',
     'table.whitelist' = 'ecommerce.attributes_kv',
     'database.history.kafka.bootstrap.servers' = 'kafka:29092',
-    'database.history.kafka.topic' = 'dbhistory.ecommerce-attributes-kv' ,
+    'database.history.kafka.topic' = 'dbhistory.ecommerce-attributes-kv-prod' ,
     'include.schema.changes' = 'false',
     'transforms'= 'unwrap,extractkey',
     'transforms.unwrap.type'= 'io.debezium.transforms.ExtractNewRecordState',
@@ -74,28 +74,28 @@ CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_01 WITH (
     'value.converter.schema.registry.url'= 'http://schema-registry:8081'
     );
 
-PRINT 'che-ecommerce.ecommerce.attributes_kv' FROM BEGINNING;
+PRINT 'che-ecommerce-prod.ecommerce.attributes_kv' FROM BEGINNING;
 
 
 
-CREATE TABLE PRODUCTS (PRODUCT_ID VARCHAR PRIMARY KEY)
-  WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.products', VALUE_FORMAT='AVRO');
+CREATE TABLE PRODUCTS_PROD (PRODUCT_ID VARCHAR PRIMARY KEY)
+  WITH (KAFKA_TOPIC='che-ecommerce-prod.ecommerce.products', VALUE_FORMAT='AVRO');
 
-CREATE TABLE ATTRIBUTES (ATTRIBUTES_ID VARCHAR PRIMARY KEY)
-  WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.attributes', VALUE_FORMAT='AVRO');
+CREATE TABLE ATTRIBUTES_PROD (ATTRIBUTES_ID VARCHAR PRIMARY KEY)
+  WITH (KAFKA_TOPIC='che-ecommerce-prod.ecommerce.attributes', VALUE_FORMAT='AVRO');
 
-CREATE TABLE ATTRIBUTES_KV (ATTRIBUTES_KV_ID VARCHAR PRIMARY KEY)
-  WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.attributes_kv', VALUE_FORMAT='AVRO');
+CREATE TABLE ATTRIBUTES_KV_PROD (ATTRIBUTES_KV_ID VARCHAR PRIMARY KEY)
+  WITH (KAFKA_TOPIC='che-ecommerce-prod.ecommerce.attributes_kv', VALUE_FORMAT='AVRO');
 
 
 SELECT TIMESTAMPTOSTRING(ROWTIME, 'HH:mm:ss') AS EVENT_TS,
        ATTRIBUTES_ID,
        DESCRIPTION
-  FROM ATTRIBUTES WHERE ID=8
+  FROM ATTRIBUTES_PROD WHERE ID=8
   EMIT CHANGES;
 
 -- Create Products Stream...
-CREATE STREAM PRODUCTS_STREAM (PRODUCT_ID VARCHAR KEY) WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.products', VALUE_FORMAT='AVRO');
+CREATE STREAM PRODUCTS_STREAM_PROD (PRODUCT_ID VARCHAR KEY) WITH (KAFKA_TOPIC='che-ecommerce-prod.ecommerce.products', VALUE_FORMAT='AVRO');
 
 SET 'auto.offset.reset' = 'earliest';
 
@@ -104,42 +104,42 @@ SELECT TIMESTAMPTOSTRING(ROWTIME, 'HH:mm:ss') AS EVENT_TS,
        ID,
        NAME,
        DESCRIPTION
-  FROM PRODUCTS_STREAM WHERE ID=2
+  FROM PRODUCTS_STREAM_PROD WHERE ID=2
   EMIT CHANGES;  
 
   -- Create Attributes Stream...
-CREATE STREAM ATTRIBUTES_STREAM (ATTRIBUTES_ID VARCHAR KEY) WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.attributes', VALUE_FORMAT='AVRO');
+CREATE STREAM ATTRIBUTES_STREAM_PROD (ATTRIBUTES_ID VARCHAR KEY) WITH (KAFKA_TOPIC='che-ecommerce-prod.ecommerce.attributes', VALUE_FORMAT='AVRO');
 
 SELECT TIMESTAMPTOSTRING(ROWTIME, 'HH:mm:ss') AS EVENT_TS,
        ATTRIBUTES_ID,
        ID,
        DESCRIPTION
-  FROM ATTRIBUTES_STREAM WHERE ID=2
+  FROM ATTRIBUTES_STREAM_PROD WHERE ID=2
   EMIT CHANGES;
 
 -- Create AttributesKV Stream...
-CREATE STREAM ATTRIBUTES_KV_STREAM (ATTRIBUTES_KV_ID VARCHAR KEY) WITH (KAFKA_TOPIC='che-ecommerce.ecommerce.attributes_kv', VALUE_FORMAT='AVRO');
+CREATE STREAM ATTRIBUTES_KV_STREAM_PROD (ATTRIBUTES_KV_ID VARCHAR KEY) WITH (KAFKA_TOPIC='che-ecommerce-prod.ecommerce.attributes_kv', VALUE_FORMAT='AVRO');
 
 SELECT TIMESTAMPTOSTRING(ROWTIME, 'HH:mm:ss') AS EVENT_TS,
        ATTRIBUTES_KV_ID,
        ID,
        ATTRIBUTE
-  FROM ATTRIBUTES_KV_STREAM WHERE ID=2
+  FROM ATTRIBUTES_KV_STREAM_PROD WHERE ID=2
   EMIT CHANGES;
 
 
 -- Join the products with atributes streams
 
-SELECT * 
-  FROM ATTRIBUTES A
- RIGHT JOIN ATTRIBUTES_KV AK
-    ON A.ID = AK.ATTRIBUTE
-  EMIT CHANGES; 
+-- SELECT * 
+--   FROM ATTRIBUTES_PROD A
+--  RIGHT JOIN ATTRIBUTES_KV_PROD AK
+--     ON A.ID = AK.ATTRIBUTE
+--   EMIT CHANGES; 
 
 
   SELECT * 
-    FROM PRODUCTS P
-   INNER JOIN ATTRIBUTES A
+    FROM PRODUCTS_PROD P
+   INNER JOIN ATTRIBUTES_PROD A
       ON P.PRODUCT_ID = A.ATTRIBUTES_ID
     EMIT CHANGES;  
 
@@ -147,8 +147,8 @@ SELECT *
   SELECT P.PRODUCT_ID, P.NAME, P.DESCRIPTION AS PRODUCT_DESCRIPTION,
          A.ATTRIBUTES_ID, A.DESCRIPTION AS ATTRIBUTE_DESCRIPTION,
          P.CREATE_TS AS PRODUCT_CREATE_TS, P.UPDATE_TS AS PRODUCT_UPDATE_TS
-    FROM PRODUCTS P
-   INNER JOIN ATTRIBUTES A
+    FROM PRODUCTS_PROD P
+   INNER JOIN ATTRIBUTES_PROD A
       ON P.PRODUCT_ID = A.ATTRIBUTES_ID
     EMIT CHANGES;  
 
@@ -161,20 +161,19 @@ SELECT *
 
 SET 'auto.offset.reset' = 'earliest';
 
-CREATE STREAM PRODUCTS_WITH_ATTR_DATA
-  WITH (KAFKA_TOPIC='products-with-attr-data') AS
+CREATE STREAM PRODUCTS_WITH_ATTR_DATA_PROD_2
+  WITH (KAFKA_TOPIC='products-with-attr-data-production-2') AS
 SELECT P.PRODUCT_ID, P.NAME, P.DESCRIPTION AS PRODUCT_DESCRIPTION,
        A.ATTRIBUTES_ID, A.DESCRIPTION AS ATTRIBUTE_DESCRIPTION,
        P.CREATE_TS AS PRODUCT_CREATE_TS, P.UPDATE_TS AS PRODUCT_UPDATE_TS
- FROM PRODUCTS_STREAM P
-INNER JOIN ATTRIBUTES A
+ FROM PRODUCTS_STREAM_PROD P
+INNER JOIN ATTRIBUTES_PROD A
    ON P.PRODUCT_ID = A.ATTRIBUTES_ID
  EMIT CHANGES;
 
  -- Create sink connector with ES and send the data over in real time...
 
-
- CREATE SINK CONNECTOR SINK_ELASTIC_PRODUCTS_WITH_ATTR_01 WITH (
+ CREATE SINK CONNECTOR SINK_ELASTIC_PRODUCTS_WITH_ATTR_PROD_2_01 WITH (
   'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
   'connection.url' = 'http://elasticsearch:9200',
   'type.name' = '',
@@ -182,7 +181,7 @@ INNER JOIN ATTRIBUTES A
   'errors.tolerance' = 'all',
   'errors.log.enable' = 'true',
   'errors.log.include.messages' = 'true',
-  'topics' = 'products-with-attr-data',
+  'topics' = 'products-with-attr-data-production-2',
   'key.ignore' = 'true',
   'schema.ignore' = 'true',
   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
@@ -191,7 +190,7 @@ INNER JOIN ATTRIBUTES A
   'transforms.ExtractTimestamp.timestamp.field' = 'EXTRACT_TS'
 );
 
- CREATE SINK CONNECTOR SINK_ELASTIC_PRODUCTS_ONLY_01 WITH (
+ CREATE SINK CONNECTOR SINK_ELASTIC_PRODUCTS_ONLY_PROD_01 WITH (
   'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
   'connection.url' = 'http://elasticsearch:9200',
   'type.name' = '',
@@ -199,7 +198,7 @@ INNER JOIN ATTRIBUTES A
   'errors.tolerance' = 'all',
   'errors.log.enable' = 'true',
   'errors.log.include.messages' = 'true',
-  'topics' = 'che-ecommerce.ecommerce.products',
+  'topics' = 'che-ecommerce-prod.ecommerce.products',
   'key.ignore' = 'true',
   'schema.ignore' = 'true',
   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
@@ -208,7 +207,7 @@ INNER JOIN ATTRIBUTES A
   'transforms.ExtractTimestamp.timestamp.field' = 'EXTRACT_TS'
 );
 
- CREATE SINK CONNECTOR SINK_ELASTIC_ATTRIBUTES_ONLY_01 WITH (
+ CREATE SINK CONNECTOR SINK_ELASTIC_ATTRIBUTES_ONLY_PROD_01 WITH (
   'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
   'connection.url' = 'http://elasticsearch:9200',
   'type.name' = '',
@@ -216,7 +215,7 @@ INNER JOIN ATTRIBUTES A
   'errors.tolerance' = 'all',
   'errors.log.enable' = 'true',
   'errors.log.include.messages' = 'true',
-  'topics' = 'che-ecommerce.ecommerce.attributes',
+  'topics' = 'che-ecommerce-prod.ecommerce.attributes',
   'key.ignore' = 'true',
   'schema.ignore' = 'true',
   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
