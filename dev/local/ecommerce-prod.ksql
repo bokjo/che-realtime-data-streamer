@@ -3,10 +3,10 @@
 -- DROP CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_PROD_01;
 CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_PRODUCTS_PROD_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = '34.107.37.79',
+    'database.hostname' = '[YOUR DB HOST GOES HERE]',
     'database.port' = '3306',
-    'database.user' = 'debezium',
-    'database.password' = 'dbz',
+    'database.user' = '[YOUR DB USER GOES HERE]',
+    'database.password' = '[YOUR DB PASSWD GOES HERE]',
     'database.server.id' = '52',
     'database.server.name' = 'che-ecommerce-prod',
     'table.whitelist' = 'ecommerce.products',
@@ -31,10 +31,10 @@ PRINT 'che-ecommerce-prod.ecommerce.products' FROM BEGINNING;
 -- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_PROD_01;
 CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_PROD_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = '34.107.37.79',
+    'database.hostname' = '[YOUR DB HOST GOES HERE]',
     'database.port' = '3306',
-    'database.user' = 'debezium',
-    'database.password' = 'dbz',
+    'database.user' = '[YOUR DB USER GOES HERE]',
+    'database.password' = '[YOUR DB PASSWD GOES HERE]',
     'database.server.id' = '53',
     'database.server.name' = 'che-ecommerce-prod',
     'table.whitelist' = 'ecommerce.attributes',
@@ -55,10 +55,10 @@ PRINT 'che-ecommerce-prod.ecommerce.attributes' FROM BEGINNING;
 -- DROP CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_PROD_01;
 CREATE SOURCE CONNECTOR SOURCE_MYSQL_EC_ATTRIBUTES_KV_PROD_01 WITH (
     'connector.class' = 'io.debezium.connector.mysql.MySqlConnector',
-    'database.hostname' = '34.107.37.79',
+    'database.hostname' = '[YOUR DB HOST GOES HERE]',
     'database.port' = '3306',
-    'database.user' = 'debezium',
-    'database.password' = 'dbz',
+    'database.user' = '[YOUR DB USER GOES HERE]',
+    'database.password' = '[YOUR DB PASSWD GOES HERE]',
     'database.server.id' = '54',
     'database.server.name' = 'che-ecommerce-prod',
     'table.whitelist' = 'ecommerce.attributes_kv',
